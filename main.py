@@ -20,10 +20,34 @@ def MED(S, T):
 
 
 def fast_MED(S, T, MED={}):
-    # TODO -  implement top-down memoization
-    pass
+    if (S, T) in MED:
+        return MED[(S, T)]
+    if not S:
+        return len(T)
+    elif not T:
+        return len(S)
+    elif S[0] == T[0]:
+        MED[(S, T)] = fast_MED(S[1:], T[1:], MED)
+    else:
+        MED[(S, T)] = 1 + min(fast_MED(S, T[1:], MED), fast_MED(S[1:], T, MED), fast_MED(S[1:], T[1:], MED))
+    return MED[(S, T)]
 
 def fast_align_MED(S, T, MED={}):
-    # TODO - keep track of alignment
-    pass
+    if (S, T) in MED:
+        return MED[(S, T)]
+    if not S:
+        return ('-' * len(T), T)
+    elif not T:
+        return (S, '-' * len(S))
+    elif S[0] == T[0]:
+        aligned_S, aligned_T = fast_align_MED(S[1:], T[1:], MED)
+        MED[(S, T)] = (S[0] + aligned_S, T[0] + aligned_T)
+    else:
+        options = [
+            (1 + fast_MED(S, T[1:], MED), '-' + T[0] + fast_align_MED(S, T[1:], MED)[1]),
+            (1 + fast_MED(S[1:], T, MED), S[0] + '-' + fast_align_MED(S[1:], T, MED)[1]),
+            (1 + fast_MED(S[1:], T[1:], MED), S[0] + T[0] + fast_align_MED(S[1:], T[1:], MED)[1])
+        ]
+        MED[(S, T)] = min(options, key=lambda x: x[0])
+    return MED[(S, T)]
 
