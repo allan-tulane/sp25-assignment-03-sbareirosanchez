@@ -32,22 +32,28 @@ def fast_MED(S, T, MED={}):
         MED[(S, T)] = 1 + min(fast_MED(S, T[1:], MED), fast_MED(S[1:], T, MED), fast_MED(S[1:], T[1:], MED))
     return MED[(S, T)]
 
-def fast_align_MED(S, T, MED={}):
-    if (S, T) in MED:
-        return MED[(S, T)]
+def fast_align_MED(S, T, memo={}):
+    if (S, T) in memo:
+        return memo[(S, T)]
+    
     if not S:
-        return ('-' * len(T), T)
+        memo[(S, T)] = ('-' * len(T), T)
     elif not T:
-        return (S, '-' * len(S))
+        memo[(S, T)] = (S, '-' * len(S))
     elif S[0] == T[0]:
-        aligned_S, aligned_T = fast_align_MED(S[1:], T[1:], MED)
-        MED[(S, T)] = (S[0] + aligned_S, T[0] + aligned_T)
+        aligned_S, aligned_T = fast_align_MED(S[1:], T[1:], memo)
+        memo[(S, T)] = (S[0] + aligned_S, T[0] + aligned_T)
     else:
-        options = [
-            (1 + fast_MED(S, T[1:], MED), '-' + T[0] + fast_align_MED(S, T[1:], MED)[1]),
-            (1 + fast_MED(S[1:], T, MED), S[0] + '-' + fast_align_MED(S[1:], T, MED)[1]),
-            (1 + fast_MED(S[1:], T[1:], MED), S[0] + T[0] + fast_align_MED(S[1:], T[1:], MED)[1])
-        ]
-        MED[(S, T)] = min(options, key=lambda x: x[0])
-    return MED[(S, T)]
+        ins_S, ins_T = fast_align_MED(S, T[1:], memo)
+        insert = (1 + fast_MED(S, T[1:], memo), '-' + ins_S, T[0] + ins_T)
+        
+        del_S, del_T = fast_align_MED(S[1:], T, memo)
+        delete = (1 + fast_MED(S[1:], T, memo), S[0] + del_S, '-' + del_T)
+        
+        sub_S, sub_T = fast_align_MED(S[1:], T[1:], memo)
+        substitute = (1 + fast_MED(S[1:], T[1:], memo), S[0] + sub_S, T[0] + sub_T)
+
+        best = min([insert, delete, substitute], key=lambda x: x[0])
+        memo[(S, T)] = (best[1], best[2])
+    return memo[(S, T)]
 
