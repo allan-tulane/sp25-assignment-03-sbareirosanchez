@@ -12,5 +12,9 @@ Place all written answers from `assignment-03.md` here for easier grading.
 
 1c) Work: The total number of steps corresponds to the number of 1s in the binary representation of N. In the worst case (all bits are 1), this is O(log N) additions to the result list. Span: since each coin decision depends on the current N only and updates it, the operations are inherently sequential. So, Span = O(log N) in worst-case time (each subtraction and append is constant time but done log N times in worst case).
 
-2a) The greedy 
+2a) 
+𝑁
+=
+6
+N=6. A greedy approach would first pick the largest denomination not exceeding 6, which is 4, leaving a remainder of 2. Then it would pick two 1s, totaling three coins. However, the optimal solution is to use two 3s, which sums to 6 using only two coins. This example clearly shows that the greedy algorithm does not always produce the minimal number of coins when denominations are arbitrary.
 
